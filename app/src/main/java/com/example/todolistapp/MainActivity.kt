@@ -3,45 +3,31 @@ package com.example.todolistapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.ViewModelProvider
+import com.example.todolistapp.ui.TodoApp
 import com.example.todolistapp.ui.theme.ToDoListAppTheme
+import com.example.todolistapp.database.TodoDatabase
+import com.example.todolistapp.viewmodel.TodoViewModel
+import com.example.todolistapp.viewmodel.TodoViewModelFactory
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var todoViewModel: TodoViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        // Initialize the ViewModel with the custom factory
+        todoViewModel = ViewModelProvider(
+            this,
+            TodoViewModelFactory(TodoDatabase.getDatabase(applicationContext).todoDao())
+        ).get(TodoViewModel::class.java)
+
+        // Set content view with TodoApp composable
         setContent {
             ToDoListAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                TodoApp(todoViewModel) // Now it should recognize TodoApp correctly
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ToDoListAppTheme {
-        Greeting("Android")
     }
 }
